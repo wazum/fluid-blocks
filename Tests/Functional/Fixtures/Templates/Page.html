@@ -1,0 +1,6 @@
+<f:spaceless>
+[stage:<block:get name="stage">default stage</block:get>]
+[body:{block:get(name: 'bodyClass', default: 'plain')}]
+<f:for each="{elements}" as="element"><f:cObject typoscriptObjectPath="lib.element" data="{element.data}" /></f:for>
+[scripts:<block:get name="scripts" />]
+</f:spaceless>

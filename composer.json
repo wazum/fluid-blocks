@@ -1,0 +1,64 @@
+{
+    "name": "wazum/fluid-blocks",
+    "type": "typo3-cms-extension",
+    "description": "Send HTML from content element and plugin templates to named slots in the page template, in any render order",
+    "keywords": ["typo3", "typo3-extension", "fluid", "viewhelper", "blocks", "slots"],
+    "homepage": "https://github.com/wazum/fluid-blocks",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Wolfgang Klinger",
+            "email": "wolfgang@wazum.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "typo3/cms-core": "^13.4 || ^14.3",
+        "typo3/cms-fluid": "^13.4 || ^14.3",
+        "typo3/cms-frontend": "^13.4 || ^14.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.65",
+        "infection/infection": "^0.31 || ^0.35",
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^11.5 || ^12",
+        "typo3/cms-install": "^13.4 || ^14.3",
+        "typo3/testing-framework": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wazum\\FluidBlocks\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Wazum\\FluidBlocks\\Tests\\": "Tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "infection/extension-installer": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "fluid_blocks",
+            "version": "1.0.0",
+            "Package": {
+                "providesPackages": {}
+            },
+            "web-dir": "public"
+        }
+    },
+    "scripts": {
+        "test:unit": "phpunit -c Tests/phpunit.xml",
+        "test:functional": "typo3DatabaseDriver=pdo_sqlite phpunit -c Tests/phpunit.functional.xml",
+        "test:mutation": "infection --threads=4 --show-mutations",
+        "phpstan": "phpstan analyse -c phpstan.neon",
+        "cs:check": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix"
+    }
+}

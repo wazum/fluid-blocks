@@ -1,0 +1,6 @@
+<f:layout name="Content" />
+
+<f:section name="Main">
+    <block:set name="stage"><h1>{data.header}</h1><p id="subline"><block:get name="subline">no subline</block:get></p></block:set>
+    <f:render partial="Badge" arguments="{data: data}" />
+</f:section>

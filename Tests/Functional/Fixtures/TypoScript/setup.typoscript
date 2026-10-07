@@ -1,0 +1,20 @@
+lib.element = FLUIDTEMPLATE
+lib.element {
+  file = EXT:fluid_blocks/Tests/Functional/Fixtures/Templates/Element.html
+}
+
+page = PAGE
+page {
+  10 = FLUIDTEMPLATE
+  10 {
+    file = EXT:fluid_blocks/Tests/Functional/Fixtures/Templates/Page.html
+    dataProcessing {
+      10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
+      10 {
+        table = tt_content
+        orderBy = sorting
+        as = elements
+      }
+    }
+  }
+}

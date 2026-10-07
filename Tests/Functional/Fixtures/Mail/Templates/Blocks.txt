@@ -1,0 +1,1 @@
+[text stage:<block:get name="stage">mail fallback</block:get>]<block:set name="stage">mail stage</block:set>

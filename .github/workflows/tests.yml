@@ -1,0 +1,114 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, 'fix/*', 'feature/*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl
+          tools: composer:2
+      - run: composer install --no-interaction
+      - run: composer phpstan
+      - run: composer cs:check
+
+  tests:
+    name: Tests (PHP ${{ matrix.php }}, TYPO3 ${{ matrix.typo3 }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.2', typo3: '13.4' }
+          - { php: '8.3', typo3: '13.4' }
+          - { php: '8.4', typo3: '13.4' }
+          - { php: '8.2', typo3: '14.3' }
+          - { php: '8.3', typo3: '14.3' }
+          - { php: '8.4', typo3: '14.3' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, pdo_sqlite
+          tools: composer:2
+      - run: |
+          composer require "typo3/cms-core:^${{ matrix.typo3 }}" "typo3/cms-fluid:^${{ matrix.typo3 }}" "typo3/cms-frontend:^${{ matrix.typo3 }}" --no-update --no-interaction
+          composer require --dev "typo3/cms-install:^${{ matrix.typo3 }}" --no-update --no-interaction
+          composer install --no-interaction
+      - run: composer test:unit
+      - run: composer test:functional
+
+  e2e:
+    name: E2E (PHP ${{ matrix.php }}, TYPO3 ${{ matrix.typo3 }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.2', typo3: '13.4' }
+          - { php: '8.4', typo3: '14.3' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, pdo_sqlite
+          tools: composer:2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Tests/E2E/package-lock.json
+
+      - name: Install nginx and sqlite3
+        run: sudo apt-get install -y nginx sqlite3
+
+      - name: Build TYPO3 instance
+        run: bash Tests/E2E/bin/setup-typo3.sh
+        env:
+          TYPO3_VERSION: ^${{ matrix.typo3 }}
+
+      - name: Start nginx and PHP-FPM
+        run: bash Tests/E2E/bin/serve.sh
+        env:
+          PHP_FPM: php-fpm${{ matrix.php }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('Tests/E2E/package-lock.json') }}
+
+      - name: Run Playwright
+        working-directory: Tests/E2E
+        run: |
+          npm ci
+          npx playwright install chromium
+          npx playwright test --reporter=list
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-typo3-${{ matrix.typo3 }}
+          path: Tests/E2E/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Show server logs
+        if: ${{ failure() }}
+        run: tail -n 50 /tmp/fluid-blocks-e2e/.server/*.log /tmp/fluid-blocks-e2e/var/log/*.log || true

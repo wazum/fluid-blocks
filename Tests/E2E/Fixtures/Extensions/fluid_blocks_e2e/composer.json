@@ -1,0 +1,23 @@
+{
+    "name": "wazum/fluid-blocks-e2e",
+    "type": "typo3-cms-extension",
+    "description": "Demo site for the fluid-blocks end-to-end tests",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "wazum/fluid-blocks": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wazum\\FluidBlocksE2e\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "fluid_blocks_e2e",
+            "version": "1.0.0",
+            "Package": {
+                "providesPackages": {}
+            }
+        }
+    }
+}

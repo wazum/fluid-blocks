@@ -1,0 +1,9 @@
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <main>
+        <f:for each="{elements}" as="element">
+            <f:cObject typoscriptObjectPath="lib.element" data="{element.data}" table="tt_content" />
+        </f:for>
+    </main>
+</f:section>

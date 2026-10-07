@@ -1,0 +1,11 @@
+{
+    "name": "fluid-blocks-e2e",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "playwright test --reporter=list"
+    },
+    "devDependencies": {
+        "@playwright/test": "1.63.0"
+    }
+}

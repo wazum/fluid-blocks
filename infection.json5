@@ -1,0 +1,16 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["Classes"]
+    },
+    "phpUnit": {
+        "configDir": "Tests"
+    },
+    "initialTestsPhpOptions": "-dzend_extension=xdebug.so -dxdebug.mode=coverage",
+    "logs": {
+        "text": "php://stdout"
+    },
+    "mutators": {
+        "@default": true
+    }
+}
